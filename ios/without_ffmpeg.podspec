@@ -1,29 +1,43 @@
-#
-# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint without_ffmpeg.podspec` to validate before publishing.
-#
 Pod::Spec.new do |s|
   s.name             = 'without_ffmpeg'
   s.version          = '0.0.1'
-  s.summary          = '一个插件'
-  s.description      = <<-DESC
-一个插件
-                       DESC
-  s.homepage         = 'http://example.com'
+  s.summary          = 'FFmpeg Kit for Flutter (without_ffmpeg)'
+  s.description      = 'A Flutter plugin for running FFmpeg and FFprobe commands on iOS using FFmpegKit.'
+  s.homepage         = 'https://github.com/arthenica/ffmpeg-kit'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+
+  s.platform         = :ios, '12.1'
+  s.requires_arc     = true
+  s.static_framework = true
+
   s.dependency 'Flutter'
-  s.platform = :ios, '12.0'
 
-  # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  s.swift_version = '5.0'
+  s.source_files        = 'Classes/**/*'
+  s.public_header_files = 'Classes/**/*.h'
 
-  # If your plugin requires a privacy manifest, for example if it uses any
-  # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your
-  # plugin's privacy impact, and then uncomment this line. For more information,
-  # see https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
-  # s.resource_bundles = {'without_ffmpeg_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
+  s.vendored_frameworks = 'Frameworks/*.xcframework'
+  s.ios.frameworks      = 'VideoToolbox'
+  s.libraries           = 'z', 'bz2', 'c++', 'iconv'
+
+  # Same download as ffmpeg_kit_min_gpl, then convert to xcframework for simulator.
+  s.prepare_command = <<-CMD
+    download_url="https://github.com/meetleev/flutter-ffmpeg-kit/releases/download/6.0.3/ffmpeg-kit-ios-min-gpl.zip"
+    if [ ! -d "./Frameworks/ffmpegkit.framework" ]; then
+        echo "Downloading from ${download_url}..."
+        rm -rf Frameworks
+        mkdir -p Frameworks
+        curl -L "${download_url}" -o /tmp/ffmpeg_kit_ios.zip
+        unzip -o /tmp/ffmpeg_kit_ios.zip -d Frameworks
+        rm -f /tmp/ffmpeg_kit_ios.zip
+        rm -rf Frameworks/__MACOSX
+    fi
+    bash scripts/setup_ios_xcframework.sh
+  CMD
+
+  s.pod_target_xcconfig = {
+    'DEFINES_MODULE' => 'YES',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64',
+  }
 end

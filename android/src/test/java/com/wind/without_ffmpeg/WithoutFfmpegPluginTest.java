@@ -17,13 +17,13 @@ import org.junit.Test;
 
 public class WithoutFfmpegPluginTest {
   @Test
-  public void onMethodCall_getPlatformVersion_returnsExpectedValue() {
+  public void onMethodCall_getPlatform_returnsAndroid() {
     WithoutFfmpegPlugin plugin = new WithoutFfmpegPlugin();
 
-    final MethodCall call = new MethodCall("getPlatformVersion", null);
+    final MethodCall call = new MethodCall("getPlatform", null);
     MethodChannel.Result mockResult = mock(MethodChannel.Result.class);
     plugin.onMethodCall(call, mockResult);
 
-    verify(mockResult).success("Android " + android.os.Build.VERSION.RELEASE);
+    verify(mockResult).success("android");
   }
 }

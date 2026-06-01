@@ -1,12 +1,8 @@
+library without_ffmpeg;
 
-import 'without_ffmpeg_platform_interface.dart';
-
-class WithoutFfmpeg {
-  Future<String?> getPlatformVersion() {
-    return WithoutFfmpegPlatform.instance.getPlatformVersion();
-  }
-
-  Future<String?> test1() {
-    return WithoutFfmpegPlatform.instance.test1();
-  }
-}
+export 'arch_detect.dart';
+export 'ffmpeg_kit.dart';
+export 'ffmpeg_kit_config.dart';
+export 'ffprobe_kit.dart';
+export 'media_information.dart';
+export 'return_code.dart';

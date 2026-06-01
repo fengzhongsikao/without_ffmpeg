@@ -4,6 +4,7 @@ version = "1.0"
 buildscript {
     repositories {
         google()
+        maven { url 'https://maven.aliyun.com/repository/public' }
         mavenCentral()
     }
 
@@ -15,6 +16,7 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
+        maven { url 'https://maven.aliyun.com/repository/public' }
         mavenCentral()
     }
 }
@@ -32,13 +34,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 21
-    }
-
-    dependencies {
-        testImplementation("junit:junit:4.13.2")
-        testImplementation("org.mockito:mockito-core:5.0.0")
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.4'
+        minSdk = 24
     }
 
     testOptions {
@@ -50,4 +46,11 @@ android {
             }
         }
     }
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.6.0'
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.4'
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.0.0")
 }

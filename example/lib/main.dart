@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
-import 'package:without_ffmpeg/without_ffmpeg.dart';
+import 'package:without_ffmpeg/ffmpeg_kit.dart';
+import 'package:without_ffmpeg/ffmpeg_kit_config.dart';
+import 'package:without_ffmpeg/return_code.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,44 +15,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  String _test1= 'Unknown';
-  final _withoutFfmpegPlugin = WithoutFfmpeg();
+  String _output = 'Tap the button to run ffmpeg -version';
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    String test1;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _withoutFfmpegPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    try {
-      test1 =
-          await _withoutFfmpegPlugin.test1() ?? 'Unknown test1 version';
-    } on PlatformException {
-      test1 = 'Failed to get test1 version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
+  Future<void> _runFfmpegVersion() async {
+    setState(() => _output = 'Running...');
+    await FFmpegKitConfig.enableRedirection();
+    final session = await FFmpegKit.execute('-version');
+    final returnCode = await session.getReturnCode();
+    final logs = await session.getAllLogsAsString();
     if (!mounted) return;
-
     setState(() {
-      _platformVersion = platformVersion;
-      _test1 = test1;
+      if (ReturnCode.isSuccess(returnCode)) {
+        _output = logs ?? '(no output)';
+      } else {
+        _output = 'Failed: rc=${returnCode?.getValue()}\n$logs';
+      }
     });
   }
 
@@ -61,16 +37,24 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Column(
-          children: [
-            Center(
-              child: Text('Running on: $_platformVersion\n'),
-            ),
-            Text('Running on: $_test1\n'),
-          ],
+        appBar: AppBar(title: const Text('without_ffmpeg example')),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FilledButton(
+                onPressed: _runFfmpegVersion,
+                child: const Text('ffmpeg -version'),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Text(_output),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
