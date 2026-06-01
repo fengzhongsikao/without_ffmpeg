@@ -14,4 +14,10 @@ class MethodChannelWithoutFfmpeg extends WithoutFfmpegPlatform {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
+  @override
+  Future<String?> test1() async {
+    final version = await methodChannel.invokeMethod<String>('test1');
+    return version;
+  }
 }

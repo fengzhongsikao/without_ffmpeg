@@ -12,6 +12,8 @@ public class WithoutFfmpegPlugin: NSObject, FlutterPlugin {
     switch call.method {
     case "getPlatformVersion":
       result("iOS " + UIDevice.current.systemVersion)
+    case "test1":
+      result("flutter 真好啊")
     default:
       result(FlutterMethodNotImplemented)
     }

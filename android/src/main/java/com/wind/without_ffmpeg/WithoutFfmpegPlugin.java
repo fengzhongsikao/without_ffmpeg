@@ -26,6 +26,8 @@ public class WithoutFfmpegPlugin implements FlutterPlugin, MethodCallHandler {
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     if (call.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
+    } else if (call.method.equals("test1")) {
+      result.success("flutter 真好啊");
     } else {
       result.notImplemented();
     }

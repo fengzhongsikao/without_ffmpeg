@@ -26,4 +26,8 @@ abstract class WithoutFfmpegPlatform extends PlatformInterface {
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<String?> test1() {
+    throw UnimplementedError('test1() has not been implemented.');
+  }
 }
