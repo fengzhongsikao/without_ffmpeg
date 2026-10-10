@@ -30,7 +30,7 @@ import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-/** Android FFmpegKit-compatible bridge over mobile-ffmpeg-full:4.4 */
+/** Android FFmpegKit-compatible bridge over mobile-ffmpeg-full-gpl:4.4 */
 public class WithoutFfmpegPlugin implements FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
 
   private static final String METHOD_CHANNEL = "flutter.arthenica.com/ffmpeg_kit";
@@ -368,7 +368,7 @@ public class WithoutFfmpegPlugin implements FlutterPlugin, MethodChannel.MethodC
         result.success(MobileFfmpegSessions.listByType(MobileFfmpegSessions.SESSION_TYPE_MEDIA_INFORMATION));
         break;
       case "getPackageName":
-        result.success("mobile-ffmpeg-full");
+        result.success("mobile-ffmpeg-full-gpl");
         break;
       case "getExternalLibraries":
         result.success(new ArrayList<String>());
