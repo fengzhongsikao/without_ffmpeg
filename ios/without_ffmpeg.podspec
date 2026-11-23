@@ -21,17 +21,14 @@ Pod::Spec.new do |s|
   s.ios.frameworks      = 'VideoToolbox'
   s.libraries           = 'z', 'bz2', 'c++', 'iconv'
 
-  # Download device frameworks if missing, then convert to xcframework
-  # (device arm64/arm64e + Apple Silicon simulator arm64).
+  # Frameworks already include ios-arm64 (device) and
+  # ios-arm64_x86_64-simulator. Do not re-download or relabel them.
   s.prepare_command = 'bash scripts/setup_ios_xcframework.sh'
 
-  # Upstream min-gpl binaries have no x86_64 simulator slice.
-  # Apple Silicon simulators use arm64; exclude x86_64 so link succeeds.
+  # Simulator builds may be arm64 or x86_64. This only drops 32-bit i386.
+  # iphoneos (real device) is not affected.
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64',
-  }
-  s.user_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
   }
 end
