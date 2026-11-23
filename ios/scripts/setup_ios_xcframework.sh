@@ -1,6 +1,9 @@
 #!/bin/bash
 # Converts device-only FFmpegKit .framework bundles into .xcframework with a
 # simulator variant (arm64 @ IOSSIMULATOR). Required for iOS Simulator on Apple Silicon.
+#
+# Idempotent: if Frameworks/*.xcframework already exist, does nothing.
+# Safe to run from CocoaPods prepare_command on every pod install.
 
 set -euo pipefail
 
@@ -11,18 +14,21 @@ DOWNLOAD_URL="https://github.com/meetleev/flutter-ffmpeg-kit/releases/download/6
 
 cd "${IOS_DIR}"
 
-if [ ! -d "${FRAMEWORKS_DIR}" ] || [ -z "$(ls -A "${FRAMEWORKS_DIR}" 2>/dev/null || true)" ]; then
+# Already converted — do not wipe / re-download.
+if compgen -G "${FRAMEWORKS_DIR}/*.xcframework" > /dev/null; then
+  echo "XCFrameworks already present, skipping download/conversion."
+  exit 0
+fi
+
+if [ ! -d "${FRAMEWORKS_DIR}" ] || [ -z "$(ls -A "${FRAMEWORKS_DIR}" 2>/dev/null || true)" ] \
+  || ! compgen -G "${FRAMEWORKS_DIR}/*.framework" > /dev/null; then
   echo "Downloading FFmpegKit iOS frameworks..."
+  rm -rf "${FRAMEWORKS_DIR}"
   mkdir -p "${FRAMEWORKS_DIR}"
   curl -L "${DOWNLOAD_URL}" -o /tmp/ffmpeg_kit_ios.zip
   unzip -o /tmp/ffmpeg_kit_ios.zip -d "${FRAMEWORKS_DIR}"
   rm -f /tmp/ffmpeg_kit_ios.zip
-fi
-
-# Already converted.
-if compgen -G "${FRAMEWORKS_DIR}/*.xcframework" > /dev/null; then
-  echo "XCFrameworks already present, skipping conversion."
-  exit 0
+  rm -rf "${FRAMEWORKS_DIR}/__MACOSX"
 fi
 
 if ! compgen -G "${FRAMEWORKS_DIR}/*.framework" > /dev/null; then

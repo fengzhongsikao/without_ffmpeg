@@ -21,23 +21,17 @@ Pod::Spec.new do |s|
   s.ios.frameworks      = 'VideoToolbox'
   s.libraries           = 'z', 'bz2', 'c++', 'iconv'
 
-  # Same download as ffmpeg_kit_min_gpl, then convert to xcframework for simulator.
-  s.prepare_command = <<-CMD
-    download_url="https://github.com/meetleev/flutter-ffmpeg-kit/releases/download/6.0.3/ffmpeg-kit-ios-min-gpl.zip"
-    if [ ! -d "./Frameworks/ffmpegkit.framework" ]; then
-        echo "Downloading from ${download_url}..."
-        rm -rf Frameworks
-        mkdir -p Frameworks
-        curl -L "${download_url}" -o /tmp/ffmpeg_kit_ios.zip
-        unzip -o /tmp/ffmpeg_kit_ios.zip -d Frameworks
-        rm -f /tmp/ffmpeg_kit_ios.zip
-        rm -rf Frameworks/__MACOSX
-    fi
-    bash scripts/setup_ios_xcframework.sh
-  CMD
+  # Download device frameworks if missing, then convert to xcframework
+  # (device arm64/arm64e + Apple Silicon simulator arm64).
+  s.prepare_command = 'bash scripts/setup_ios_xcframework.sh'
 
+  # Upstream min-gpl binaries have no x86_64 simulator slice.
+  # Apple Silicon simulators use arm64; exclude x86_64 so link succeeds.
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64',
+  }
+  s.user_target_xcconfig = {
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 x86_64',
   }
 end
